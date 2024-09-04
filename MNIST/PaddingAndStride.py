@@ -1,0 +1,37 @@
+import torch 
+from torch import nn
+
+'''In the following example, we create a two-dimensional 
+convolutional layer with a height and width of 3 
+and apply 1 pixel of padding on all sides.Given an input 
+with a height and width of 8, we find that 
+the height and width of the output is also 8.'''
+
+# We define a helper function to calculate convolutions. It initializes the
+# convolutional layer weights and performs corresponding dimensionality
+# elevations and reductions on the input and output
+def comp_conv2d(conv2d, X):
+    # (1, 1) indicates that batch size and the number of channels are both 1
+    X = X.reshape((1, 1) + X.shape)
+    Y = conv2d(X)
+    # Strip the first two dimensions: examples and channels
+    return Y.reshape(Y.shape[2:])
+
+# 1 row and column is padded on either side, so a total of 2 rows or columns
+# are added
+conv2d = nn.LazyConv2d(1, kernel_size=3, padding=1)
+X = torch.rand(size=(8, 8))
+print(X)
+res = comp_conv2d(conv2d, X)
+print(res.shape)
+print(res)
+
+# We use a convolution kernel with height 5 and width 3. The padding on either
+# side of the height and width are 2 and 1, respectively
+conv2d = nn.LazyConv2d(1, kernel_size=(5, 3), padding=(2, 1))
+comp_conv2d(conv2d, X).shape
+
+# Stride
+conv2d = nn.LazyConv2d(1, kernel_size=3, padding=1, stride=2)
+comp_conv2d(conv2d, X).shape 
+# [4,4] -> [2, 2]
