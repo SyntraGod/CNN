@@ -51,7 +51,7 @@ class LeNet5(nn.Module):
         x = self.fc2(x)
         return x
  
-model = LeNet5()
+model = LeNet5().to('cuda')
  
 optimizer = optim.Adam(model.parameters())
 loss_fn = nn.CrossEntropyLoss()
@@ -60,6 +60,7 @@ n_epochs = 10
 for epoch in range(n_epochs):
     model.train()
     for X_batch, y_batch in trainloader:
+        X_batch, y_batch = X_batch.to('cuda'), y_batch.to('cuda')
         y_pred = model(X_batch)
         loss = loss_fn(y_pred, y_batch)
         optimizer.zero_grad()
@@ -70,8 +71,12 @@ for epoch in range(n_epochs):
     acc = 0
     count = 0
     for X_batch, y_batch in testloader:
+        X_batch, y_batch = X_batch.to('cuda'), y_batch.to('cuda')
         y_pred = model(X_batch)
         acc += (torch.argmax(y_pred, 1) == y_batch).float().sum()
         count += len(y_batch)
     acc = acc / count
     print("Epoch %d: model accuracy %.2f%%" % (epoch, acc*100))
+    
+ # Save the model
+torch.save(model.state_dict(), 'lenet5_model.pth')
